@@ -96,6 +96,7 @@ const swagger_1 = __webpack_require__(2);
 const app_module_1 = __webpack_require__(3);
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    app.enableCors();
     const options = new swagger_1.DocumentBuilder()
         .setTitle('学习的视频网站后台API')
         .setDescription('供后台使用的服务端API')
@@ -138,12 +139,14 @@ const common_1 = __webpack_require__(4);
 const app_controller_1 = __webpack_require__(5);
 const app_service_1 = __webpack_require__(6);
 const db_1 = __webpack_require__(7);
-const users_module_1 = __webpack_require__(13);
+const users_module_1 = __webpack_require__(15);
+const courses_module_1 = __webpack_require__(18);
+const episodes_module_1 = __webpack_require__(20);
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     common_1.Module({
-        imports: [db_1.DbModule, users_module_1.UsersModule],
+        imports: [db_1.DbModule, users_module_1.UsersModule, courses_module_1.CoursesModule, episodes_module_1.EpisodesModule],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })
@@ -175,6 +178,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const common_1 = __webpack_require__(4);
 const app_service_1 = __webpack_require__(6);
+const swagger_1 = __webpack_require__(2);
 let AppController = class AppController {
     constructor(appService) {
         this.appService = appService;
@@ -191,6 +195,7 @@ __decorate([
 ], AppController.prototype, "getHello", null);
 AppController = __decorate([
     common_1.Controller(),
+    swagger_1.ApiUseTags('首页'),
     __metadata("design:paramtypes", [app_service_1.AppService])
 ], AppController);
 exports.AppController = AppController;
@@ -252,7 +257,9 @@ const common_1 = __webpack_require__(4);
 const db_service_1 = __webpack_require__(9);
 const nestjs_typegoose_1 = __webpack_require__(10);
 const user_model_1 = __webpack_require__(11);
-const models = nestjs_typegoose_1.TypegooseModule.forFeature([user_model_1.User]);
+const course_model_1 = __webpack_require__(13);
+const episode_model_1 = __webpack_require__(14);
+const models = nestjs_typegoose_1.TypegooseModule.forFeature([user_model_1.User, course_model_1.Course, episode_model_1.Episode]);
 let DbModule = class DbModule {
 };
 DbModule = __decorate([
@@ -360,21 +367,102 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const typegoose_1 = __webpack_require__(12);
+const swagger_1 = __webpack_require__(2);
+let Course = class Course {
+};
+__decorate([
+    typegoose_1.prop(),
+    swagger_1.ApiModelProperty({ description: '课程名称' }),
+    __metadata("design:type", String)
+], Course.prototype, "name", void 0);
+__decorate([
+    typegoose_1.prop(),
+    swagger_1.ApiModelProperty({ description: '封面图' }),
+    __metadata("design:type", String)
+], Course.prototype, "cover", void 0);
+__decorate([
+    typegoose_1.arrayProp({ itemsRef: 'Episode' }),
+    __metadata("design:type", Array)
+], Course.prototype, "episodes", void 0);
+Course = __decorate([
+    typegoose_1.modelOptions({
+        schemaOptions: {
+            timestamps: true,
+        },
+    })
+], Course);
+exports.Course = Course;
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const typegoose_1 = __webpack_require__(12);
+let Episode = class Episode {
+};
+__decorate([
+    typegoose_1.prop(),
+    __metadata("design:type", String)
+], Episode.prototype, "name", void 0);
+__decorate([
+    typegoose_1.prop(),
+    __metadata("design:type", String)
+], Episode.prototype, "file", void 0);
+Episode = __decorate([
+    typegoose_1.modelOptions({
+        schemaOptions: {
+            timestamps: true,
+        },
+    })
+], Episode);
+exports.Episode = Episode;
+
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const common_1 = __webpack_require__(4);
-const users_controller_1 = __webpack_require__(14);
+const users_controller_1 = __webpack_require__(16);
 let UsersModule = class UsersModule {
 };
 UsersModule = __decorate([
     common_1.Module({
-        controllers: [users_controller_1.UsersController]
+        controllers: [users_controller_1.UsersController],
     })
 ], UsersModule);
 exports.UsersModule = UsersModule;
 
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -395,13 +483,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const common_1 = __webpack_require__(4);
 const nestjs_typegoose_1 = __webpack_require__(10);
 const user_model_1 = __webpack_require__(11);
-const nestjs_mongoose_crud_1 = __webpack_require__(15);
+const nestjs_mongoose_crud_1 = __webpack_require__(17);
 const swagger_1 = __webpack_require__(2);
 let UsersController = class UsersController {
     constructor(model) {
         this.model = model;
     }
+    option() {
+        return {
+            title: '用户管理',
+            menuType: 'icon',
+            column: [{ prop: 'username', label: '用户名' }],
+        };
+    }
 };
+__decorate([
+    common_1.Get('option'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "option", null);
 UsersController = __decorate([
     nestjs_mongoose_crud_1.Crud({
         model: user_model_1.User,
@@ -415,10 +516,171 @@ exports.UsersController = UsersController;
 
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, exports) {
 
 module.exports = require("nestjs-mongoose-crud");
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const common_1 = __webpack_require__(4);
+const courses_controller_1 = __webpack_require__(19);
+let CoursesModule = class CoursesModule {
+};
+CoursesModule = __decorate([
+    common_1.Module({
+        controllers: [courses_controller_1.CoursesController],
+    })
+], CoursesModule);
+exports.CoursesModule = CoursesModule;
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const common_1 = __webpack_require__(4);
+const nestjs_mongoose_crud_1 = __webpack_require__(17);
+const course_model_1 = __webpack_require__(13);
+const nestjs_typegoose_1 = __webpack_require__(10);
+const swagger_1 = __webpack_require__(2);
+let CoursesController = class CoursesController {
+    constructor(model) {
+        this.model = model;
+    }
+    option() {
+        return {
+            title: '课程管理',
+            menuType: 'icon',
+            column: [
+                { prop: 'name', label: '课程名称' },
+                { prop: 'cover', label: '课程封面图' },
+            ],
+        };
+    }
+};
+__decorate([
+    common_1.Get('option'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], CoursesController.prototype, "option", null);
+CoursesController = __decorate([
+    nestjs_mongoose_crud_1.Crud({
+        model: course_model_1.Course,
+    }),
+    common_1.Controller('courses'),
+    swagger_1.ApiUseTags('课程'),
+    __param(0, nestjs_typegoose_1.InjectModel(course_model_1.Course)),
+    __metadata("design:paramtypes", [Object])
+], CoursesController);
+exports.CoursesController = CoursesController;
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const common_1 = __webpack_require__(4);
+const episodes_controller_1 = __webpack_require__(21);
+let EpisodesModule = class EpisodesModule {
+};
+EpisodesModule = __decorate([
+    common_1.Module({
+        controllers: [episodes_controller_1.EpisodesController]
+    })
+], EpisodesModule);
+exports.EpisodesModule = EpisodesModule;
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const common_1 = __webpack_require__(4);
+const nestjs_mongoose_crud_1 = __webpack_require__(17);
+const episode_model_1 = __webpack_require__(14);
+const nestjs_typegoose_1 = __webpack_require__(10);
+const swagger_1 = __webpack_require__(2);
+let EpisodesController = class EpisodesController {
+    constructor(model) {
+        this.model = model;
+    }
+    option() {
+        return {
+            title: '课程管理',
+            menuType: 'icon',
+            column: [{ prop: 'name', label: '课时名称' }],
+        };
+    }
+};
+__decorate([
+    common_1.Get('option'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], EpisodesController.prototype, "option", null);
+EpisodesController = __decorate([
+    nestjs_mongoose_crud_1.Crud({
+        model: episode_model_1.Episode,
+    }),
+    common_1.Controller('episodes'),
+    swagger_1.ApiUseTags('课时'),
+    __param(0, nestjs_typegoose_1.InjectModel(episode_model_1.Episode)),
+    __metadata("design:paramtypes", [Object])
+], EpisodesController);
+exports.EpisodesController = EpisodesController;
+
 
 /***/ })
 /******/ ]);
