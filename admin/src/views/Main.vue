@@ -3,7 +3,7 @@
     <el-aside width="200px">
       <el-menu mode="vertical" style="height:100vh" router :default-active="$route.path">
         <el-submenu
-          v-for="(item, index) in menu.item"
+          v-for="(item, index) of menu.item"
           :index="`index + 1`"
           :key="`menu-item-${index}`"
         >
@@ -12,7 +12,7 @@
             v-for="(subItem, subIndex) in item.items"
             :index="subItem.path"
             :key="`menu-item-${index}-${subIndex}`"
-          >{{subItem.title}}</el-menu-item>
+          >{{ subItem.title }}</el-menu-item>
         </el-submenu>
       </el-menu>
     </el-aside>

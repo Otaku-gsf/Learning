@@ -492,7 +492,10 @@ let UsersController = class UsersController {
     option() {
         return {
             title: '用户管理',
-            menuType: 'icon',
+            index: true,
+            indexLabel: '序号',
+            align: 'center',
+            menuAlign: 'center',
             column: [{ prop: 'username', label: '用户名' }],
         };
     }
@@ -577,9 +580,22 @@ let CoursesController = class CoursesController {
     option() {
         return {
             title: '课程管理',
-            menuType: 'icon',
+            index: true,
+            indexLabel: '序号',
+            align: 'center',
+            menuAlign: 'center',
             column: [
-                { prop: 'name', label: '课程名称' },
+                {
+                    prop: 'name',
+                    label: '课程名称',
+                    rules: [
+                        {
+                            required: true,
+                            message: '请输入课程',
+                            trigger: 'blur',
+                        },
+                    ],
+                },
                 { prop: 'cover', label: '课程封面图' },
             ],
         };
@@ -659,7 +675,10 @@ let EpisodesController = class EpisodesController {
     option() {
         return {
             title: '课程管理',
-            menuType: 'icon',
+            index: true,
+            indexLabel: '序号',
+            align: 'center',
+            menuAlign: 'center',
             column: [{ prop: 'name', label: '课时名称' }],
         };
     }

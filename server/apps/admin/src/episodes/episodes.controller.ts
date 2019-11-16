@@ -20,7 +20,10 @@ export class EpisodesController {
   option() {
     return {
       title: '课程管理',
-      menuType: 'icon',
+      index: true,
+      indexLabel: '序号',
+      align: 'center',
+      menuAlign: 'center',
       column: [{ prop: 'name', label: '课时名称' }],
     };
   }

@@ -19,9 +19,22 @@ export class CoursesController {
   option() {
     return {
       title: '课程管理',
-      menuType: 'icon',
+      index: true,
+      indexLabel: '序号',
+      align: 'center',
+      menuAlign: 'center',
       column: [
-        { prop: 'name', label: '课程名称' },
+        {
+          prop: 'name',
+          label: '课程名称',
+          rules: [
+            {
+              required: true,
+              message: '请输入课程',
+              trigger: 'blur',
+            },
+          ],
+        },
         { prop: 'cover', label: '课程封面图' },
       ],
     };

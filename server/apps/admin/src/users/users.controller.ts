@@ -16,7 +16,10 @@ export class UsersController {
   option() {
     return {
       title: '用户管理',
-      menuType: 'icon',
+      index: true,
+      indexLabel: '序号',
+      align: 'center',
+      menuAlign: 'center',
       column: [{ prop: 'username', label: '用户名' }],
     };
   }

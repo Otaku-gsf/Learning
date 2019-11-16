@@ -4,9 +4,11 @@
       v-if="option.column"
       :data="data.data"
       :option="option"
+      :page="page"
       @row-save="add"
       @row-update="update"
       @row-del="remove"
+      @on-load="changePage"
     ></avue-crud>
   </div>
 </template>
@@ -21,19 +23,46 @@ interface IRow {
   episode: Array<String>;
 }
 
+interface IPage {
+  currentPage?: number;
+  pageSize?: number;
+  total?: number;
+  pageSizes?: Array<number>;
+}
+
 @Component({})
 export default class CourseList extends Vue {
   data = {};
-
   @Prop(String) resource!: string;
+
+  page: IPage = {
+    total: 1,
+    pageSize: 2,
+    pageSizes: [2, 5, 10],
+  };
+
+  query: any = {
+    limit: 2,
+  };
 
   // 表格配置
   option = {};
 
   // 获取数据
   async fetch() {
-    const res = await this.$axios.get(this.resource);
+    const res = await this.$axios.get(this.resource, {
+      params: {
+        query: this.query,
+      },
+    });
+    this.page.total = res.data.total;
     this.data = res.data;
+  }
+
+  async changePage({ pageSize, currentPage }: IPage) {
+    this.query.page = currentPage;
+    this.query.limit = pageSize;
+    this.fetch();
   }
 
   // 获取表格配置信息
@@ -74,8 +103,8 @@ export default class CourseList extends Vue {
   }
 
   created() {
-    this.fetch();
     this.fetchOption();
+    this.fetch();
   }
 }
 </script>
