@@ -9,6 +9,7 @@
       @row-update="update"
       @row-del="remove"
       @on-load="changePage"
+      @sort-change="sortChange"
     ></avue-crud>
   </div>
 </template>
@@ -30,6 +31,17 @@ interface IPage {
   pageSizes?: Array<number>;
 }
 
+interface ISort {
+  prop: string;
+  order: string;
+}
+
+interface IQuery {
+  order?: ISort | null;
+  limit?: number;
+  page?: number;
+}
+
 @Component({})
 export default class CourseList extends Vue {
   data = {};
@@ -37,16 +49,26 @@ export default class CourseList extends Vue {
 
   page: IPage = {
     total: 1,
-    pageSize: 2,
-    pageSizes: [2, 5, 10],
+    pageSize: 5,
+    pageSizes: [5, 10],
   };
 
-  query: any = {
-    limit: 2,
-  };
+  query: IQuery = {};
 
   // 表格配置
   option = {};
+
+  // 排序功能
+  sortChange({ prop, order }: ISort) {
+    if (!order) {
+      this.query.order = null;
+    } else {
+      this.query = {
+        [prop]: order === 'ascending' ? 1 : -1,
+      };
+    }
+    this.fetch();
+  }
 
   // 获取数据
   async fetch() {

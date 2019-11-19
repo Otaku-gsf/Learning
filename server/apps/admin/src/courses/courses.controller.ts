@@ -27,6 +27,7 @@ export class CoursesController {
         {
           prop: 'name',
           label: '课程名称',
+          sortable: true,
           rules: [
             {
               required: true,

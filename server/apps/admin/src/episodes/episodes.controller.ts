@@ -24,7 +24,7 @@ export class EpisodesController {
       indexLabel: '序号',
       align: 'center',
       menuAlign: 'center',
-      column: [{ prop: 'name', label: '课时名称' }],
+      column: [{ prop: 'name', label: '课时名称', sortable: true }],
     };
   }
 }

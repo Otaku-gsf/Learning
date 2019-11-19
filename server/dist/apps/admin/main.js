@@ -588,6 +588,7 @@ let CoursesController = class CoursesController {
                 {
                     prop: 'name',
                     label: '课程名称',
+                    sortable: true,
                     rules: [
                         {
                             required: true,
@@ -679,7 +680,7 @@ let EpisodesController = class EpisodesController {
             indexLabel: '序号',
             align: 'center',
             menuAlign: 'center',
-            column: [{ prop: 'name', label: '课时名称' }],
+            column: [{ prop: 'name', label: '课时名称', sortable: true }],
         };
     }
 };
