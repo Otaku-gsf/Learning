@@ -10,6 +10,7 @@
       @row-del="remove"
       @on-load="changePage"
       @sort-change="sortChange"
+      @search-change="searchChange"
     ></avue-crud>
   </div>
 </template>
@@ -40,6 +41,15 @@ interface IQuery {
   order?: ISort | null;
   limit?: number;
   page?: number;
+  where?: IWhere;
+}
+
+interface IWhere {
+  name?: string;
+}
+
+interface IOption {
+  column?: Array<any>;
 }
 
 @Component({})
@@ -56,7 +66,7 @@ export default class CourseList extends Vue {
   query: IQuery = {};
 
   // 表格配置
-  option = {};
+  option: IOption = {};
 
   // 排序功能
   sortChange({ prop, order }: ISort) {
@@ -67,6 +77,21 @@ export default class CourseList extends Vue {
         [prop]: order === 'ascending' ? 1 : -1,
       };
     }
+    this.fetch();
+  }
+
+  // 数据查询 根据条件判断是否模糊查询
+  searchChange(where: IWhere) {
+    global.console.log(where);
+    for (const key in where) {
+      if (where.hasOwnProperty(key)) {
+        const fields = this.option.column.find(v => v.prop === key);
+        if (fields.regex) {
+          where[key] = { $regex: where[key] };
+        }
+      }
+    }
+    this.query.where = where;
     this.fetch();
   }
 
@@ -131,4 +156,8 @@ export default class CourseList extends Vue {
 }
 </script>
 
-<style></style>
+<style>
+/* .avue-upload__avatar {
+  width: auto !important;
+} */
+</style>

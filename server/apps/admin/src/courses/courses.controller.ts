@@ -28,6 +28,8 @@ export class CoursesController {
           prop: 'name',
           label: '课程名称',
           sortable: true,
+          search: true,
+          regex: true,
           rules: [
             {
               required: true,
@@ -35,8 +37,16 @@ export class CoursesController {
               trigger: 'blur',
             },
           ],
+          row: true,
         },
-        { prop: 'cover', label: '课程封面图' },
+        {
+          prop: 'cover',
+          label: '课程封面图',
+          type: 'upload',
+          listType: 'picture-img',
+          action: '/upload',
+          width: 120,
+        },
       ],
     };
   }

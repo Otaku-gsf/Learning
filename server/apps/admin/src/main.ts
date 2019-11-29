@@ -1,9 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // 加载静态资源 须先指定框架类型 这里即NestExpressApplication
+  app.useStaticAssets('uploads', {
+    prefix: '/uploads',
+  });
 
   // 解决跨域问题
   app.enableCors();

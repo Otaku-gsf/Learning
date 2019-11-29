@@ -20,7 +20,7 @@ export class UsersController {
       indexLabel: '序号',
       align: 'center',
       menuAlign: 'center',
-      column: [{ prop: 'username', label: '用户名' }],
+      column: [{ prop: 'username', label: '用户名', sortable: true }],
     };
   }
 }
