@@ -96,6 +96,9 @@ const swagger_1 = __webpack_require__(2);
 const app_module_1 = __webpack_require__(3);
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    app.useStaticAssets('uploads', {
+        prefix: '/uploads',
+    });
     app.enableCors();
     const options = new swagger_1.DocumentBuilder()
         .setTitle('学习的视频网站后台API')
@@ -105,7 +108,7 @@ async function bootstrap() {
     const document = swagger_1.SwaggerModule.createDocument(app, options);
     swagger_1.SwaggerModule.setup('api-docs', app, document);
     await app.listen(3000);
-    console.log('http://localhost:3000');
+    console.log('http://localhost:3000/api-docs');
 }
 bootstrap();
 
@@ -138,15 +141,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const common_1 = __webpack_require__(4);
 const app_controller_1 = __webpack_require__(5);
 const app_service_1 = __webpack_require__(6);
-const db_1 = __webpack_require__(7);
-const users_module_1 = __webpack_require__(15);
-const courses_module_1 = __webpack_require__(18);
-const episodes_module_1 = __webpack_require__(20);
+const db_1 = __webpack_require__(8);
+const users_module_1 = __webpack_require__(16);
+const courses_module_1 = __webpack_require__(19);
+const episodes_module_1 = __webpack_require__(21);
+const platform_express_1 = __webpack_require__(7);
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     common_1.Module({
-        imports: [db_1.DbModule, users_module_1.UsersModule, courses_module_1.CoursesModule, episodes_module_1.EpisodesModule],
+        imports: [
+            platform_express_1.MulterModule.register({
+                dest: 'uploads',
+            }),
+            db_1.DbModule,
+            users_module_1.UsersModule,
+            courses_module_1.CoursesModule,
+            episodes_module_1.EpisodesModule,
+        ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })
@@ -175,16 +187,25 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const common_1 = __webpack_require__(4);
 const app_service_1 = __webpack_require__(6);
 const swagger_1 = __webpack_require__(2);
+const platform_express_1 = __webpack_require__(7);
 let AppController = class AppController {
     constructor(appService) {
         this.appService = appService;
     }
     getHello() {
         return this.appService.getHello();
+    }
+    async unload(file) {
+        return {
+            url: `http://localhost:3000/uploads/${file.filename}`,
+        };
     }
 };
 __decorate([
@@ -193,6 +214,14 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", String)
 ], AppController.prototype, "getHello", null);
+__decorate([
+    common_1.Post('upload'),
+    common_1.UseInterceptors(platform_express_1.FileInterceptor('file')),
+    __param(0, common_1.UploadedFile('file')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AppController.prototype, "unload", null);
 AppController = __decorate([
     common_1.Controller(),
     swagger_1.ApiUseTags('首页'),
@@ -228,6 +257,12 @@ exports.AppService = AppService;
 
 /***/ }),
 /* 7 */
+/***/ (function(module, exports) {
+
+module.exports = require("@nestjs/platform-express");
+
+/***/ }),
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -236,12 +271,12 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-__export(__webpack_require__(8));
 __export(__webpack_require__(9));
+__export(__webpack_require__(10));
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -254,11 +289,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const common_1 = __webpack_require__(4);
-const db_service_1 = __webpack_require__(9);
-const nestjs_typegoose_1 = __webpack_require__(10);
-const user_model_1 = __webpack_require__(11);
-const course_model_1 = __webpack_require__(13);
-const episode_model_1 = __webpack_require__(14);
+const db_service_1 = __webpack_require__(10);
+const nestjs_typegoose_1 = __webpack_require__(11);
+const user_model_1 = __webpack_require__(12);
+const course_model_1 = __webpack_require__(14);
+const episode_model_1 = __webpack_require__(15);
 const models = nestjs_typegoose_1.TypegooseModule.forFeature([user_model_1.User, course_model_1.Course, episode_model_1.Episode]);
 let DbModule = class DbModule {
 };
@@ -282,7 +317,7 @@ exports.DbModule = DbModule;
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -304,13 +339,13 @@ exports.DbService = DbService;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 module.exports = require("nestjs-typegoose");
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -325,7 +360,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const typegoose_1 = __webpack_require__(12);
+const typegoose_1 = __webpack_require__(13);
 const swagger_1 = __webpack_require__(2);
 let User = class User {
 };
@@ -350,13 +385,13 @@ exports.User = User;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports) {
 
 module.exports = require("@typegoose/typegoose");
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -371,7 +406,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const typegoose_1 = __webpack_require__(12);
+const typegoose_1 = __webpack_require__(13);
 const swagger_1 = __webpack_require__(2);
 let Course = class Course {
 };
@@ -400,7 +435,7 @@ exports.Course = Course;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -415,7 +450,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const typegoose_1 = __webpack_require__(12);
+const typegoose_1 = __webpack_require__(13);
 let Episode = class Episode {
 };
 __decorate([
@@ -437,7 +472,7 @@ exports.Episode = Episode;
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -450,7 +485,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const common_1 = __webpack_require__(4);
-const users_controller_1 = __webpack_require__(16);
+const users_controller_1 = __webpack_require__(17);
 let UsersModule = class UsersModule {
 };
 UsersModule = __decorate([
@@ -462,7 +497,7 @@ exports.UsersModule = UsersModule;
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -481,9 +516,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const common_1 = __webpack_require__(4);
-const nestjs_typegoose_1 = __webpack_require__(10);
-const user_model_1 = __webpack_require__(11);
-const nestjs_mongoose_crud_1 = __webpack_require__(17);
+const nestjs_typegoose_1 = __webpack_require__(11);
+const user_model_1 = __webpack_require__(12);
+const nestjs_mongoose_crud_1 = __webpack_require__(18);
 const swagger_1 = __webpack_require__(2);
 let UsersController = class UsersController {
     constructor(model) {
@@ -519,13 +554,13 @@ exports.UsersController = UsersController;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports) {
 
 module.exports = require("nestjs-mongoose-crud");
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -538,7 +573,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const common_1 = __webpack_require__(4);
-const courses_controller_1 = __webpack_require__(19);
+const courses_controller_1 = __webpack_require__(20);
 let CoursesModule = class CoursesModule {
 };
 CoursesModule = __decorate([
@@ -550,7 +585,7 @@ exports.CoursesModule = CoursesModule;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -569,9 +604,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const common_1 = __webpack_require__(4);
-const nestjs_mongoose_crud_1 = __webpack_require__(17);
-const course_model_1 = __webpack_require__(13);
-const nestjs_typegoose_1 = __webpack_require__(10);
+const nestjs_mongoose_crud_1 = __webpack_require__(18);
+const course_model_1 = __webpack_require__(14);
+const nestjs_typegoose_1 = __webpack_require__(11);
 const swagger_1 = __webpack_require__(2);
 let CoursesController = class CoursesController {
     constructor(model) {
@@ -589,6 +624,7 @@ let CoursesController = class CoursesController {
                     prop: 'name',
                     label: '课程名称',
                     sortable: true,
+                    search: true,
                     rules: [
                         {
                             required: true,
@@ -596,8 +632,16 @@ let CoursesController = class CoursesController {
                             trigger: 'blur',
                         },
                     ],
+                    row: true,
                 },
-                { prop: 'cover', label: '课程封面图' },
+                {
+                    prop: 'cover',
+                    label: '课程封面图',
+                    type: 'upload',
+                    listType: 'picture-img',
+                    action: 'upload',
+                    width: 120,
+                },
             ],
         };
     }
@@ -621,7 +665,7 @@ exports.CoursesController = CoursesController;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -634,7 +678,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const common_1 = __webpack_require__(4);
-const episodes_controller_1 = __webpack_require__(21);
+const episodes_controller_1 = __webpack_require__(22);
 let EpisodesModule = class EpisodesModule {
 };
 EpisodesModule = __decorate([
@@ -646,7 +690,7 @@ exports.EpisodesModule = EpisodesModule;
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -665,9 +709,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const common_1 = __webpack_require__(4);
-const nestjs_mongoose_crud_1 = __webpack_require__(17);
-const episode_model_1 = __webpack_require__(14);
-const nestjs_typegoose_1 = __webpack_require__(10);
+const nestjs_mongoose_crud_1 = __webpack_require__(18);
+const episode_model_1 = __webpack_require__(15);
+const nestjs_typegoose_1 = __webpack_require__(11);
 const swagger_1 = __webpack_require__(2);
 let EpisodesController = class EpisodesController {
     constructor(model) {
